@@ -1,1 +1,4 @@
-language: php
+dist: trusty
+
+script:
+  - docker run -v $(pwd):/app --rm phpunit/phpunit --colors=always tests
