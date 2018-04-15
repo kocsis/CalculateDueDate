@@ -59,6 +59,22 @@ class CalculateDueDateTest extends TestCase
 		$this->assertEquals($this->generatedAssertDateFormat($dueDateCalculate), '2018-04-16 09:33', '+1 hours');
 	}
 
+	function testLessIsWorkStartTime()
+	{
+		$actualTime = $this->generatedActualTime(2018, 4, 13, 6, 33);
+		$dueDateCalculate = new CalculateDueDateDate(1, $actualTime);
+		$this->expectException(NotWorkTimeException::class);
+		$this->generatedAssertDateFormat($dueDateCalculate);
+	}
+
+	function testMoreIsWorkEndTime()
+	{
+		$actualTime = $this->generatedActualTime(2018, 4, 13, 17, 33);
+		$dueDateCalculate = new CalculateDueDateDate(1, $actualTime);
+		$this->expectException(NotWorkTimeException::class);
+		$this->generatedAssertDateFormat($dueDateCalculate);
+	}
+
 	private function generatedAssertDateFormat(CalculateDueDateDate $dueDateCalculate)
 	{
 		return $dueDateCalculate->getProjectEndTime()->format('Y-m-d H:i');

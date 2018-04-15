@@ -24,6 +24,7 @@ class CalculateDueDateDate implements ProjectDateTimeCalculate
 	public function getProjectEndTime(): DateTime
 	{
 		$projectTime = $this->actualTime;
+		$this->exceptionIfWorkStartTimeInTheNotWorkTime($projectTime);
 		$workDaysByHours = $this->getWorkDaysByHours($this->workHours);
 		$projectTime = $this->modifyTimeIfThereAreWorkDays($workDaysByHours, $projectTime);
 		$projectTime = $this->modifyTimeIfThereAreNotWorkingDays((bool)$workDaysByHours, $projectTime);
@@ -116,4 +117,20 @@ class CalculateDueDateDate implements ProjectDateTimeCalculate
 	{
 		return (int)round($hours / $this->workHoursInOneDay(), PHP_ROUND_HALF_DOWN);
 	}
+
+	protected function exceptionIfWorkStartTimeInTheNotWorkTime(DateTime $projectTime): void
+	{
+		$hours = (int)$projectTime->format("H");
+		$minute = (int)$projectTime->format("i");
+
+		if (
+			$hours > self::WORK_END_HOUR ||
+			($hours === self::WORK_END_HOUR && $minute !== 0) ||
+			$hours < self::WORK_START_HOUR
+		) {
+			throw new NotWorkTimeException('Work start|end time in the not work time.');
+		}
+	}
 }
+
+class NotWorkTimeException extends Exception {}
